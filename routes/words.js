@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
 });
 
 router.post(
-  "/add-word/",
+  "/",
   [check("word", "Word is required").not().isEmpty()],
   async (req, res) => {
     // Check inputs validation
@@ -38,5 +38,40 @@ router.post(
     }
   }
 );
+
+router.delete("/:wordId", async (req, res) => {
+  try {
+    await Words.findOneAndRemove({ _id: req.params.wordId });
+    res.json("Word deleted successfully!");
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server error");
+  }
+});
+
+router.put("/:wordId", async (req, res) => {
+  const { word, priority } = req.body;
+
+  try {
+    let wordReq = await Words.findById(req.params.wordId);
+    if (!wordReq) {
+      return res.json("Word not found!");
+    }
+
+    wordReq = await Words.findOneAndUpdate(
+      { _id: req.params.wordId },
+      {
+        $set: { word, priority },
+      },
+      { new: true }
+    );
+
+    await wordReq.save();
+    res.json(wordReq);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server error");
+  }
+});
 
 module.exports = router;
