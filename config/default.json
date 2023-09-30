@@ -1,0 +1,4 @@
+{
+  "mongoURI": "mongodb+srv://hichembenaoun:e7nACgaDlzLHlxRy@word-canvas.lsa51m6.mongodb.net/development?retryWrites=true&w=majority",
+  "jwtSecret": "0d45d34771c82ed127802417307b8d25474f85e482fceb3b9bd474d7d54378449b161b3b1ce2ad19e07da6b0f39a1e8b506af82d892bf7bdf29a502afa6b512f41791b7787e10013aa5581b964a44002"
+}
