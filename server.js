@@ -13,18 +13,8 @@ app.use(cors());
 
 const storedWords = [];
 
-app.get("/words", (req, res) => {
-  res.json(storedWords);
-});
-
-app.post("/add-word", (req, res) => {
-  const word = req.body.word;
-  if (word) {
-    storedWords.push(word);
-    res.json({ success: true, word });
-  } else {
-    res.json({ success: false, message: "Invalid word" });
-  }
+app.get("/", (req, res) => {
+  res.json("Welcome to the Word-Canvas Backend");
 });
 
 app.use("/api/words", require("./routes/words"));
