@@ -19,6 +19,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/words", require("./routes/words"));
 app.use("/api/canvas", require("./routes/canvas"));
+app.use("/api/filler", require("./routes/filler"));
 
 app.listen(PORT, () => {
   console.log(`Server started on http://localhost:${PORT}`);
