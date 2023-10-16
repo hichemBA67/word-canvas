@@ -1,8 +1,29 @@
+/**
+ * @swagger
+ * tags:
+ *   - name: Words
+ *     description: Operations related to words
+ */
+
 const express = require("express");
 const Words = require("../models/Words");
 const router = express.Router();
 const { check, validationResult } = require("express-validator");
 
+/**
+ * @swagger
+ * /api/words:
+ *   get:
+ *     summary: Get filler
+ *     description: Get all words from database
+ *     tags:
+ *       - Words
+ *     responses:
+ *       '200':
+ *         description: Get all words
+ *       '500':
+ *         description: Server error
+ */
 router.get("/", async (req, res) => {
   const words = await Words.find();
 
@@ -13,6 +34,20 @@ router.get("/", async (req, res) => {
   res.json(words);
 });
 
+/**
+ * @swagger
+ * /api/words:
+ *   post:
+ *     summary: Create filler
+ *     description: Create the word in database
+ *     tags:
+ *       - Words
+ *     responses:
+ *       '200':
+ *         description: Word created successfully
+ *       '500':
+ *         description: Server error
+ */
 router.post(
   "/",
   [check("word", "Word is required").not().isEmpty()],
@@ -39,6 +74,26 @@ router.post(
   }
 );
 
+/**
+ * @swagger
+ * /api/words:
+ *   delete:
+ *     summary: Delete words
+ *     description: Delete the words with the wordsId in the database
+ *     tags:
+ *       - Words
+ *     parameters:
+ *       - in: query
+ *         name: wordId
+ *         description: MongoDB _id of word
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Word deleted successfully
+ *       '500':
+ *         description: Server error
+ */
 router.delete("/:wordId", async (req, res) => {
   try {
     await Words.findOneAndRemove({ _id: req.params.wordId });
@@ -49,6 +104,26 @@ router.delete("/:wordId", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/words:
+ *   put:
+ *     summary: Update word
+ *     description: Update the filler with the wordId in the database
+ *     tags:
+ *       - Words
+ *     parameters:
+ *       - in: query
+ *         name: wordId
+ *         description: MongoDB _id of filler
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Word updated successfully
+ *       '500':
+ *         description: Server error
+ */
 router.put("/:wordId", async (req, res) => {
   const { word, priority } = req.body;
 

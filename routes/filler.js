@@ -1,8 +1,29 @@
+/**
+ * @swagger
+ * tags:
+ *   - name: Fillers
+ *     description: Operations related to fillers
+ */
+
 const express = require("express");
 const Filler = require("../models/Filler");
 const router = express.Router();
 const { check, validationResult } = require("express-validator");
 
+/**
+ * @swagger
+ * /api/filler:
+ *   get:
+ *     summary: Get filler
+ *     description: Get all fillers from database
+ *     tags:
+ *       - Fillers
+ *     responses:
+ *       '200':
+ *         description: Get all fillers
+ *       '500':
+ *         description: Server error
+ */
 router.get("/", async (req, res) => {
   const filler = await Filler.find();
 
@@ -13,6 +34,20 @@ router.get("/", async (req, res) => {
   res.json(filler);
 });
 
+/**
+ * @swagger
+ * /api/filler:
+ *   post:
+ *     summary: Create filler
+ *     description: Create the filler in database
+ *     tags:
+ *       - Fillers
+ *     responses:
+ *       '200':
+ *         description: Filler created successfully
+ *       '500':
+ *         description: Server error
+ */
 router.post(
   "/",
   [check("filler", "Filler is required").not().isEmpty()],
@@ -38,6 +73,26 @@ router.post(
   }
 );
 
+/**
+ * @swagger
+ * /api/filler:
+ *   delete:
+ *     summary: Delete filler
+ *     description: Delete the filler with the fillerId in the database
+ *     tags:
+ *       - Fillers
+ *     parameters:
+ *       - in: query
+ *         name: fillerId
+ *         description: MongoDB _id of filler
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Filler deleted successfully
+ *       '500':
+ *         description: Server error
+ */
 router.delete("/:fillerId", async (req, res) => {
   try {
     await Filler.findOneAndRemove({ _id: req.params.fillerId });
@@ -48,6 +103,26 @@ router.delete("/:fillerId", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/filler:
+ *   put:
+ *     summary: Update filler
+ *     description: Update the filler with the fillerId in the database
+ *     tags:
+ *       - Fillers
+ *     parameters:
+ *       - in: query
+ *         name: fillerId
+ *         description: MongoDB _id of filler
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Filler updated successfully
+ *       '500':
+ *         description: Server error
+ */
 router.put("/:fillerId", async (req, res) => {
   const { filler } = req.body;
 

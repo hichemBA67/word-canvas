@@ -1,3 +1,10 @@
+/**
+ * @swagger
+ * tags:
+ *   - name: Canvas
+ *     description: Operations related to canvas
+ */
+
 const express = require("express");
 const router = express.Router();
 const { createCanvas, registerFont } = require("canvas");
@@ -38,6 +45,20 @@ registerFont("./assets/fonts/robot_slab/RobotoSlab-Medium.ttf", {
   family: "RobotoSlab Medium",
 });
 
+/**
+ * @swagger
+ * /api/canvas:
+ *   get:
+ *     summary: Get canvas
+ *     description: Creates the canvas with words from database and user input
+ *     tags:
+ *       - Canvas
+ *     responses:
+ *       '200':
+ *         description: Creates Canvas (res.type("image/png"))
+ *       '500':
+ *         description: Server error
+ */
 router.get("/", async (req, res) => {
   const input = req.body;
   if (input.words) {
