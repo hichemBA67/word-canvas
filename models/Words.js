@@ -12,4 +12,4 @@ const WordsSchema = new mongoose.Schema({
   },
 });
 
-module.exports = Words = mongoose.model("word", WordsSchema);
+module.exports = Words = mongoose.model("words", WordsSchema);

@@ -1,0 +1,76 @@
+.App {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  text-align: center;
+  background-color: #f4f4f4;
+  height: 100vh;
+}
+
+table {
+  width: 70%;
+  margin: 50px auto;
+  border-collapse: collapse;
+  background: #ffffff;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+table,
+th,
+td {
+  border: 1px solid #e1e1e1;
+}
+
+th,
+td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+th {
+  background-color: #555;
+  color: #ffffff;
+  user-select: none; /* Prevent text highlight on header */
+}
+
+tbody tr {
+  transition: all 0.2s;
+}
+
+/* Striped rows */
+tbody tr:nth-of-type(odd) {
+  background-color: #f5f5f5;
+}
+
+/* Hover effect */
+tbody tr:hover {
+  background-color: #eaeaea;
+  transform: scale(1.02); /* Slightly scale the row */
+  box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Remove top-left and top-right border from the first cell of the first row and the last cell of the first row respectively for rounded corners */
+thead tr:first-child th:first-child {
+  border-top-left-radius: 10px;
+}
+
+thead tr:first-child th:last-child {
+  border-top-right-radius: 10px;
+}
+
+/* ... Other styles ... */
+
+button {
+  background-color: #eb5e5e;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #b30000;
+}
