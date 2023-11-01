@@ -8,8 +8,14 @@
 const express = require("express");
 const router = express.Router();
 const { createCanvas, registerFont } = require("canvas");
+const fs = require("fs");
+const crypto = require("crypto");
+const path = require("path");
+
+const Canvas = require("../models/Canvas");
 
 // CONSTANTS
+const OUTPUT_PATH = "./assets/images";
 const MIN_FONTSIZE = 24;
 const MAX_FONTSIZE = 38;
 const BASE_FONTFAMILY = "RobotoSlab";
@@ -304,6 +310,8 @@ router.get("/", async (req, res) => {
       }
     }
 
+    saveImage(canvas);
+
     // Set the content type to image/png and send the response
     res.type("image/png");
     canvas.createPNGStream().pipe(res);
@@ -314,6 +322,29 @@ router.get("/", async (req, res) => {
 });
 
 module.exports = router;
+
+function saveImage(canvas) {
+  const stream = canvas.createPNGStream();
+  const steamHash = crypto
+    .createHash("sha256")
+    .update(userWords + Date.now())
+    .digest("hex");
+  const outputPath = `${OUTPUT_PATH}/${steamHash}.png`;
+
+  // Get directory without the filename
+  const dirPath = path.dirname(outputPath);
+
+  // Check if directory exists
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+
+  const out = fs.createWriteStream(outputPath);
+  stream.pipe(out);
+  out.on("finish", () => {
+    console.log(`The PNG file was created at ${outputPath}`);
+  });
+}
 
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
