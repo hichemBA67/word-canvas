@@ -46,7 +46,7 @@ tbody tr:nth-of-type(odd) {
 /* Hover effect */
 tbody tr:hover {
   background-color: #eaeaea;
-  transform: scale(1.02); /* Slightly scale the row */
+  transform: scale(1.01); /* Slightly scale the row */
   box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.15);
 }
 
