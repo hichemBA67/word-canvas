@@ -1,6 +1,6 @@
 // Header.js
 import React from "react";
-import "./Header.css"; // Import the CSS file
+import "./style/Header.css";
 import { Link } from "react-router-dom";
 import WCLogo from "../assets/images/WC.png";
 import byslidemotifLogo from "../assets/images/byslidemotif.png";
@@ -23,6 +23,9 @@ const Header = () => {
           </li>
           <li className="navItem">
             <Link to="/demo">Demo</Link>
+          </li>
+          <li className="navItem">
+            <Link to="/settings">Settings</Link>
           </li>
           <li className="navItem">
             <Link to="/words">Words</Link>
