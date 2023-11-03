@@ -19,20 +19,17 @@ const Header = () => {
             <Link to="/">Home</Link>
           </li>
           <li className="navItem">
-            <Link to="/orders">Orders</Link>
-          </li>
-          <li className="navItem">
             <Link to="/demo">Demo</Link>
           </li>
           <li className="navItem">
             <Link to="/settings">Settings</Link>
           </li>
-          <li className="navItem">
+          {/* <li className="navItem">
             <Link to="/words">Words</Link>
           </li>
           <li className="navItem">
             <Link to="/fillers">Fillers</Link>
-          </li>
+          </li> */}
           <li className="navItem">
             <a
               href={`${API_URL}/api-docs`}
