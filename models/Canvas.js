@@ -13,6 +13,10 @@ const CanvasSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  completed: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 module.exports = Canvas = mongoose.model("canvas", CanvasSchema);

@@ -42,7 +42,7 @@ router.post("/", canvasController.generateCanvas);
  * /api/canvas:
  *   get:
  *     summary: Get canvas
- *     description: Get canvas from canvas ID
+ *     description: Get canvas with canvas ID
  *     tags:
  *       - Canvas
  *     parameters:
@@ -60,5 +60,49 @@ router.post("/", canvasController.generateCanvas);
  *         description: Server error
  */
 router.get("/:canvasId", canvasController.getCanvas);
+
+/**
+ * @swagger
+ * /api/canvas/:
+ *   delete:
+ *     summary: Delete canvas
+ *     description: Delete canvas with canvas ID
+ *     tags:
+ *       - Canvas
+ *     parameters:
+ *       - in: query
+ *         name: canvasId
+ *         description: Internal Canvas ID (SHA256 of user input & date of generation)
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Creates Canvas (res.type("image/png"))
+ *       '400':
+ *         description: Canvas not found or Canvas cannot be deleted. Canvas is either accepted and not completed.
+ *       '404':
+ *         description: Canvas is not older than one day
+ *       '500':
+ *         description: Server error
+ */
+router.delete("/:canvasId", canvasController.deleteCanvas);
+
+/**
+ * @swagger
+ * /api/canvas:
+ *   delete:
+ *     summary: Clear canvases
+ *     description: Delete canvas all unused canvases
+ *     tags:
+ *       - Canvas
+ *     responses:
+ *       '200':
+ *         description: Creates Canvas (res.type("image/png"))
+ *       '404':
+ *         description: Canvas not found
+ *       '500':
+ *         description: Server error
+ */
+router.delete("/", canvasController.clearCanvases);
 
 module.exports = router;

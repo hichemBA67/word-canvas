@@ -333,4 +333,77 @@ const getCanvas = async (req, res) => {
   }
 };
 
-module.exports = { generateCanvas, getCanvas };
+const deleteCanvas = async (req, res) => {
+  try {
+    const canvas = await Canvas.findOne({ filename: req.params.canvasId });
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000); // Calculate time for one day ago
+
+    if (!canvas) {
+      return res.status(404).send("Canvas not found");
+    } else if (!canvas.accepted || canvas.completed) {
+      return res
+        .status(400)
+        .send(
+          `Canvas cannot be deleted. Canvas is either accepted and not completed.`
+        );
+    } else if (canvas.createdAt > oneDayAgo) {
+      return res.status(400).send(`Canvas is not older than one day`);
+    }
+
+    const IMAGES_PATH = path.join(OUTPUT_PATH, `${canvas.filename}.png`);
+
+    // Check if the file exists before attempting to delete
+    if (fs.existsSync(IMAGES_PATH)) {
+      fs.unlinkSync(IMAGES_PATH); // Delete the image file
+      await Canvas.deleteOne({ filename: req.params.canvasId }); // Delete the canvas record from database, if required
+
+      return res.send("Canvas deleted successfully");
+    } else {
+      return res.status(404).send("Image file not found");
+    }
+  } catch (error) {
+    // If there's an error, return a 500 server error
+    console.error(error);
+    return res
+      .status(500)
+      .send("An error occurred while deleting the canvas image");
+  }
+};
+
+const clearCanvases = async (req, res) => {
+  try {
+    const canvases = await Canvas.find();
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000 * 3); // Calculate time for one day ago
+
+    // Using a for...of loop to allow awaiting inside
+    for (const canvas of canvases) {
+      if (canvas.createdAt > oneDayAgo) {
+        try {
+          const IMAGES_PATH = path.join(OUTPUT_PATH, `${canvas.filename}.png`);
+
+          // Check if the file exists before attempting to delete
+          if (fs.existsSync(IMAGES_PATH)) {
+            fs.unlinkSync(IMAGES_PATH); // Delete the image file
+
+            // Assuming you want to delete by canvas._id instead of req.params.canvasId since you are iterating through multiple canvases
+            await Canvas.findOneAndRemove({ _id: canvas._id });
+            console.log(`Deleted canvas with ID: ${canvas._id}`);
+          }
+        } catch (error) {
+          // If there's an error, console log it but don't send a response yet
+          console.error(error);
+        }
+      }
+    }
+    // Send a response after all the operations are complete
+    return res.status(200).send("Unused canvases successfully cleared.");
+  } catch (error) {
+    // If there's an error while fetching the canvases, return a 500 server error
+    console.error(error);
+    return res
+      .status(500)
+      .send("An error occurred while deleting the canvases.");
+  }
+};
+
+module.exports = { generateCanvas, getCanvas, deleteCanvas, clearCanvases };
