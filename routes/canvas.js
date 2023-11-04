@@ -67,19 +67,18 @@ registerFont("./assets/fonts/robot_slab/RobotoSlab-Medium.ttf", {
  */
 router.get("/", async (req, res) => {
   const input = req.body;
-  if (input.words) {
-    userWords = input.words;
-  } else {
-    userWords = [];
-  }
 
   try {
-    // Stored Words
-    const storedWordsReq = await Words.find().select("word");
-    let storedWords = [];
-    for (let i = 0; i < storedWordsReq.length; i++) {
-      storedWords.push(storedWordsReq[i].word);
-    }
+    // Prepare UserWords
+    console.log(input.words);
+    const userWords = splitAndTrim(input.words);
+    console.log(userWords);
+    // // Stored Words
+    // const storedWordsReq = await Words.find().select("word");
+    // let storedWords = [];
+    // for (let i = 0; i < storedWordsReq.length; i++) {
+    //   storedWords.push(storedWordsReq[i].word);
+    // }
 
     // Filler
     const fillerReq = await Filler.find();
@@ -103,9 +102,9 @@ router.get("/", async (req, res) => {
     userWords.forEach((word) => {
       allPhrases.push({ text: word.toUpperCase(), type: "user" });
     });
-    storedWords.forEach((phrase) => {
-      allPhrases.push({ text: phrase.toUpperCase(), type: "stored" });
-    });
+    // storedWords.forEach((phrase) => {
+    //   allPhrases.push({ text: phrase.toUpperCase(), type: "stored" });
+    // });
 
     const shuffledPhrases = allPhrases.sort(() => 0.5 - Math.random());
     let shuffledFillers = fillers.sort(() => 0.5 - Math.random());
@@ -310,7 +309,7 @@ router.get("/", async (req, res) => {
       }
     }
 
-    saveImage(canvas);
+    saveImage(canvas, userWords);
 
     // Set the content type to image/png and send the response
     res.type("image/png");
@@ -323,7 +322,7 @@ router.get("/", async (req, res) => {
 
 module.exports = router;
 
-function saveImage(canvas) {
+function saveImage(canvas, userWords) {
   const stream = canvas.createPNGStream();
   const steamHash = crypto
     .createHash("sha256")
@@ -388,4 +387,10 @@ function logWriting(word, cursor, fontSize) {
   console.log(
     `${word} written at x:${cursor.x} - y:${cursor.y} in ${fontSize}px`
   );
+}
+
+function splitAndTrim(str) {
+  // Split the string by commas and then map each element
+  // to trim whitespace from the start and end of the string.
+  return str.split(",").map((word) => word.trim());
 }
