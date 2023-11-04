@@ -54,18 +54,30 @@ registerFont("./assets/fonts/robot_slab/RobotoSlab-Medium.ttf", {
 /**
  * @swagger
  * /api/canvas:
- *   get:
+ *   post:
  *     summary: Get canvas
- *     description: Creates the canvas with words from database and user input
+ *     description: Creates the canvas with words from user input
  *     tags:
  *       - Canvas
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               words:
+ *                 type: string
+ *                 description: A string of words separated by commas
+ *                 example: "Overcome, Progress, Achieve, Conquer"
  *     responses:
  *       '200':
  *         description: Creates Canvas (res.type("image/png"))
  *       '500':
  *         description: Server error
  */
-router.get("/", async (req, res) => {
+
+router.post("/", async (req, res) => {
   const input = req.body;
 
   try {
