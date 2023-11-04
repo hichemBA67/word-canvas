@@ -118,15 +118,16 @@ router.post("/", async (req, res) => {
     //   allPhrases.push({ text: phrase.toUpperCase(), type: "stored" });
     // });
 
-    const shuffledPhrases = allPhrases.sort(() => 0.5 - Math.random());
-    let shuffledFillers = fillers.sort(() => 0.5 - Math.random());
-
     // Set options
     const lineSpace = (MAX_FONTSIZE - MIN_FONTSIZE) / 2;
     const wordSpace = 5;
     let fontFamily;
 
     // Set Data Structures
+    const endpoint = {};
+    endpoint.x = width - padding;
+    endpoint.y = height - padding;
+
     let cursor = {};
     cursor.x = 30;
     cursor.y = 50;
@@ -136,71 +137,115 @@ router.post("/", async (req, res) => {
     console.log(
       "==================================================================================================="
     );
+
+    let shuffledPhrases;
+    let shuffledFillers = fillers.sort(() => 0.5 - Math.random());
+
+    let continueLoop = true; // A flag to control the loop
+
     // Iterate through phrases
-    shuffledPhrases.forEach(({ text, type }) => {
-      console.log(
-        `==============================================NEW PHRASE ${text}=============================`
-      );
+    do {
+      shuffledPhrases = allPhrases.sort(() => 0.5 - Math.random());
 
-      let i = 0;
-      // Generate a random index within the array length
-      const randomIndex = Math.floor(Math.random() * SUB_FONTS.length);
+      shuffledPhrases.forEach(({ text, type }) => {
+        console.log(
+          `==============================================NEW PHRASE ${text}=============================`
+        );
 
-      let fontSize = getFontSize(type);
-      fontFamily = BASE_FONTFAMILY + " " + SUB_FONTS[randomIndex];
-      ctx.font = `${fontSize}px ${fontFamily}`;
+        let i = 0;
+        // Generate a random index within the array length
+        const randomIndex = Math.floor(Math.random() * SUB_FONTS.length);
 
-      const separatedWords = text.split(" ");
+        let fontSize = getFontSize(type);
+        fontFamily = BASE_FONTFAMILY + " " + SUB_FONTS[randomIndex];
+        ctx.font = `${fontSize}px ${fontFamily}`;
 
-      const grayColor = getRandomInt(150, 20);
-      ctx.fillStyle = `rgb(${grayColor},${grayColor},${grayColor})`;
+        const separatedWords = text.split(" ");
 
-      // Iterate through words of phrase
-      separatedWords.forEach((word) => {
-        // Copy font size for line height
-        const defaultFontSize = fontSize;
+        const grayColor = getRandomInt(150, 20);
+        ctx.fillStyle = `rgb(${grayColor},${grayColor},${grayColor})`;
 
-        lineSpaceRest = width - padding - cursor.x;
-        console.log("\nNext word: " + word);
-        console.log(`Word in phrase count: ${i}`);
+        // Iterate through words of phrase
+        separatedWords.forEach((word) => {
+          // Copy font size for line height
+          const defaultFontSize = fontSize;
 
-        const textWidth = ctx.measureText(word).width;
-        console.log("Word width: " + textWidth);
+          lineSpaceRest = width - padding - cursor.x;
+          console.log("\nNext word: " + word);
+          console.log(`Word in phrase count: ${i}`);
 
-        console.log("Current cursor position x: " + cursor.x);
-        console.log("Current cursor position y: " + cursor.y);
-        console.log("Rest space would be: " + lineSpaceRest);
+          const textWidth = ctx.measureText(word).width;
+          console.log("Word width: " + textWidth);
 
-        if (cursor.x + textWidth + padding > width) {
-          // IF WORD IS OUT OF BOUNDS
-          if (i === 0) {
-            let fontSizeFit = getFontSizeForWidth(
-              ctx,
-              word,
-              lineSpaceRest,
-              fontSize,
-              fontFamily
-            );
-            console.log("++ new potential font size: " + fontSizeFit);
+          console.log("Current cursor position x: " + cursor.x);
+          console.log("Current cursor position y: " + cursor.y);
+          console.log("Rest space would be: " + lineSpaceRest);
 
-            if (fontSizeFit > 18) {
-              console.log("++ new font size accepted");
+          if (cursor.x + textWidth + padding > width) {
+            // IF WORD IS OUT OF BOUNDS
+            if (i === 0) {
+              let fontSizeFit = getFontSizeForWidth(
+                ctx,
+                word,
+                lineSpaceRest,
+                fontSize,
+                fontFamily
+              );
+              console.log("++ new potential font size: " + fontSizeFit);
 
-              // Overwrite fontsize
-              fontSize = fontSizeFit;
+              if (fontSizeFit > 18) {
+                console.log("++ new font size accepted");
 
-              // Set new font
-              ctx.font = `${fontSize}px ${fontFamily}`;
+                // Overwrite fontsize
+                fontSize = fontSizeFit;
 
-              // WRITE WORD
-              ctx.fillText(word, cursor.x, cursor.y);
+                // Set new font
+                ctx.font = `${fontSize}px ${fontFamily}`;
 
-              logWriting(word, cursor, fontSize);
+                // WRITE WORD
+                ctx.fillText(word, cursor.x, cursor.y);
 
-              // LOG CURSOR
-              console.log(`-- Cursor x updated from: ${cursor.x}`);
-              cursor.x += ctx.measureText(word).width + wordSpace;
-              console.log(`to: ${cursor.x}`);
+                logWriting(word, cursor, fontSize);
+
+                // LOG CURSOR
+                console.log(`-- Cursor x updated from: ${cursor.x}`);
+                cursor.x += ctx.measureText(word).width + wordSpace;
+                console.log(`to: ${cursor.x}`);
+              } else {
+                console.log("++ new font size declined");
+
+                if (lineSpaceRest > 0) {
+                  // Add Empty slot
+                  emptySlots.push({
+                    x: cursor.x,
+                    y: cursor.y,
+                    space: lineSpaceRest,
+                  });
+                }
+
+                // LOG CURSOR
+                console.log(`-- Cursor y updated from: ${cursor.y}`);
+                cursor.y += defaultFontSize + lineSpace;
+                console.log(`to: ${cursor.y}`);
+                console.log(`-- Cursor x updated from: ${cursor.x}`);
+                cursor.x = padding;
+                console.log(`to: ${cursor.x}`);
+
+                if (cursor.y >= endpoint.y) {
+                  continueLoop = false; // Set the flag to false to indicate the loop should exit
+                  return; // This will exit the forEach callback, not the do...while loop
+                }
+
+                // WRITE WORD
+                ctx.font = `${defaultFontSize}px ${fontFamily}`;
+                ctx.fillText(word, cursor.x, cursor.y);
+                logWriting(word, cursor, fontSize);
+
+                // LOG CURSOR
+                console.log(`-- Cursor x updated from: ${cursor.x}`);
+                cursor.x += ctx.measureText(word).width + wordSpace;
+                console.log(`to: ${cursor.x}`);
+              }
             } else {
               console.log("++ new font size declined");
 
@@ -210,12 +255,16 @@ router.post("/", async (req, res) => {
                   x: cursor.x,
                   y: cursor.y,
                   space: lineSpaceRest,
+                  fontSize: defaultFontSize,
                 });
               }
 
               // LOG CURSOR
               console.log(`-- Cursor y updated from: ${cursor.y}`);
               cursor.y += defaultFontSize + lineSpace;
+              if (cursor.y >= endpoint.y) {
+                // End while loop here
+              }
               console.log(`to: ${cursor.y}`);
               console.log(`-- Cursor x updated from: ${cursor.x}`);
               cursor.x = padding;
@@ -232,49 +281,22 @@ router.post("/", async (req, res) => {
               console.log(`to: ${cursor.x}`);
             }
           } else {
-            console.log("++ new font size declined");
-
-            if (lineSpaceRest > 0) {
-              // Add Empty slot
-              emptySlots.push({
-                x: cursor.x,
-                y: cursor.y,
-                space: lineSpaceRest,
-                fontSize: defaultFontSize,
-              });
-            }
-
-            // LOG CURSOR
-            console.log(`-- Cursor y updated from: ${cursor.y}`);
-            cursor.y += defaultFontSize + lineSpace;
-            console.log(`to: ${cursor.y}`);
-            console.log(`-- Cursor x updated from: ${cursor.x}`);
-            cursor.x = padding;
-            console.log(`to: ${cursor.x}`);
-
-            // WRITE WORD
-            ctx.font = `${defaultFontSize}px ${fontFamily}`;
             ctx.fillText(word, cursor.x, cursor.y);
             logWriting(word, cursor, fontSize);
 
-            // LOG CURSOR
             console.log(`-- Cursor x updated from: ${cursor.x}`);
             cursor.x += ctx.measureText(word).width + wordSpace;
             console.log(`to: ${cursor.x}`);
           }
-        } else {
-          ctx.fillText(word, cursor.x, cursor.y);
-          logWriting(word, cursor, fontSize);
 
-          console.log(`-- Cursor x updated from: ${cursor.x}`);
-          cursor.x += ctx.measureText(word).width + wordSpace;
-          console.log(`to: ${cursor.x}`);
-        }
-
-        // INCREASE COUNTER OF WORDS IN PHRASE
-        i++;
+          // INCREASE COUNTER OF WORDS IN PHRASE
+          i++;
+        });
       });
-    });
+      if (!continueLoop) {
+        break; // Exit the loop if the flag is set to false
+      }
+    } while (continueLoop && cursor.y <= endpoint.y);
 
     // FILL EMPTY SLOTS
     for (i = 0; i < emptySlots.length; i++) {
