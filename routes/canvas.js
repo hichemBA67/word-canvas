@@ -81,10 +81,24 @@ router.post("/", async (req, res) => {
   const input = req.body;
 
   try {
+    // Create a canvas
+    const width = 540;
+    height = 800;
+    const padding = 30;
+    const canvas = createCanvas(width, height);
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, width, height);
+
     // Prepare UserWords
-    console.log(input.words);
-    const userWords = splitAndTrim(input.words);
-    console.log(userWords);
+    let userWords;
+    if (input.words) {
+      userWords = splitAndTrim(input.words);
+    } else {
+      res.type("image/png");
+      return canvas.createPNGStream().pipe(res);
+    }
+
     // // Stored Words
     // const storedWordsReq = await Words.find().select("word");
     // let storedWords = [];
@@ -98,15 +112,6 @@ router.post("/", async (req, res) => {
     for (let i = 0; i < fillerReq.length; i++) {
       fillers.push(fillerReq[i].filler.toUpperCase());
     }
-
-    // Create a canvas
-    const width = 540;
-    height = 800;
-    const padding = 30;
-    const canvas = createCanvas(width, height);
-    const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, width, height);
 
     const allPhrases = [];
 
@@ -343,20 +348,22 @@ router.post("/", async (req, res) => {
       }
     }
 
-    saveImage(canvas, userWords);
+    if (true) {
+      await saveImage(canvas, input.words);
+    }
 
     // Set the content type to image/png and send the response
     res.type("image/png");
-    canvas.createPNGStream().pipe(res);
+    return canvas.createPNGStream().pipe(res);
   } catch (error) {
     console.error(error.message);
-    res.status(500).send("Server error");
+    return res.status(500).send("Server error");
   }
 });
 
 module.exports = router;
 
-function saveImage(canvas, userWords) {
+async function saveImage(canvas, userWords) {
   const stream = canvas.createPNGStream();
   const steamHash = crypto
     .createHash("sha256")
@@ -377,6 +384,13 @@ function saveImage(canvas, userWords) {
   out.on("finish", () => {
     console.log(`The PNG file was created at ${outputPath}`);
   });
+
+  let newCanvas = new Canvas({
+    filename: steamHash,
+    userInput: userWords,
+  });
+
+  await newCanvas.save();
 }
 
 function getRandomInt(min, max) {
