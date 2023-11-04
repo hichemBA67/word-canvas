@@ -1,83 +1,24 @@
-/**
- * @swagger
- * tags:
- *   - name: Canvas
- *     description: Operations related to canvas
- */
+const { createCanvas } = require("canvas");
+const { saveImage } = require("../utils/imageUtils");
 
-const express = require("express");
-const router = express.Router();
-const { createCanvas, registerFont } = require("canvas");
-const fs = require("fs");
-const crypto = require("crypto");
-const path = require("path");
-
-const Canvas = require("../models/Canvas");
+// UTILS
+const {
+  splitAndTrim,
+  getRandomInt,
+  getFontSize,
+  getFontSizeForWidth,
+  logWriting,
+} = require("../utils/canvasUtils");
 
 // CONSTANTS
-const OUTPUT_PATH = "./assets/images";
-const MIN_FONTSIZE = 24;
-const MAX_FONTSIZE = 38;
-const BASE_FONTFAMILY = "RobotoSlab";
-const SUB_FONTS = [
-  "Regular",
-  "Black",
-  "Bold",
-  "ExtraBold",
-  "ExtraLight",
-  "Light",
-  "Medium",
-];
+const {
+  MAX_FONTSIZE,
+  MIN_FONTSIZE,
+  BASE_FONTFAMILY,
+  SUB_FONTS,
+} = require("../constants/index");
 
-registerFont("./assets/fonts/robot_slab/RobotoSlab-Regular.ttf", {
-  family: "RobotoSlab Regular",
-});
-registerFont("./assets/fonts/robot_slab/RobotoSlab-Black.ttf", {
-  family: "RobotoSlab Black",
-});
-registerFont("./assets/fonts/robot_slab/RobotoSlab-Bold.ttf", {
-  family: "RobotoSlab Bold",
-});
-registerFont("./assets/fonts/robot_slab/RobotoSlab-ExtraBold.ttf", {
-  family: "RobotoSlab Extra Bold",
-});
-registerFont("./assets/fonts/robot_slab/RobotoSlab-ExtraLight.ttf", {
-  family: "RobotoSlab Extra Light",
-});
-registerFont("./assets/fonts/robot_slab/RobotoSlab-Light.ttf", {
-  family: "RobotoSlab Extra Bold",
-});
-registerFont("./assets/fonts/robot_slab/RobotoSlab-Medium.ttf", {
-  family: "RobotoSlab Medium",
-});
-
-/**
- * @swagger
- * /api/canvas:
- *   post:
- *     summary: Get canvas
- *     description: Creates the canvas with words from user input
- *     tags:
- *       - Canvas
- *     requestBody:
- *       required: false
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               words:
- *                 type: string
- *                 description: A string of words separated by commas
- *                 example: "Overcome, Progress, Achieve, Conquer"
- *     responses:
- *       '200':
- *         description: Creates Canvas (res.type("image/png"))
- *       '500':
- *         description: Server error
- */
-
-router.post("/", async (req, res) => {
+const getCanvas = async (req, res) => {
   const input = req.body;
 
   try {
@@ -359,86 +300,6 @@ router.post("/", async (req, res) => {
     console.error(error.message);
     return res.status(500).send("Server error");
   }
-});
+};
 
-module.exports = router;
-
-async function saveImage(canvas, userWords) {
-  const stream = canvas.createPNGStream();
-  const steamHash = crypto
-    .createHash("sha256")
-    .update(userWords + Date.now())
-    .digest("hex");
-  const outputPath = `${OUTPUT_PATH}/${steamHash}.png`;
-
-  // Get directory without the filename
-  const dirPath = path.dirname(outputPath);
-
-  // Check if directory exists
-  if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
-  }
-
-  const out = fs.createWriteStream(outputPath);
-  stream.pipe(out);
-  out.on("finish", () => {
-    console.log(`The PNG file was created at ${outputPath}`);
-  });
-
-  let newCanvas = new Canvas({
-    filename: steamHash,
-    userInput: userWords,
-  });
-
-  await newCanvas.save();
-}
-
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-function getFontSize(type) {
-  if (type == "stored") {
-    return (
-      Math.floor(Math.random() * (MAX_FONTSIZE - MIN_FONTSIZE + 1)) +
-      MIN_FONTSIZE
-    );
-  } else if (type == "user") {
-    return (
-      Math.floor(Math.random() * (MAX_FONTSIZE - MIN_FONTSIZE + 1)) +
-      MIN_FONTSIZE
-    );
-  } else {
-    return 20;
-  }
-}
-
-function getFontSizeForWidth(
-  ctx,
-  text,
-  desiredWidth,
-  initialFontSize,
-  fontFamily
-) {
-  let fontSize = initialFontSize;
-  ctx.font = `${fontSize}px ${fontFamily}`;
-
-  while (ctx.measureText(text).width > desiredWidth && fontSize > 0) {
-    fontSize--;
-    ctx.font = `${fontSize}px ${fontFamily}`;
-  }
-
-  return fontSize;
-}
-
-function logWriting(word, cursor, fontSize) {
-  console.log(
-    `${word} written at x:${cursor.x} - y:${cursor.y} in ${fontSize}px`
-  );
-}
-
-function splitAndTrim(str) {
-  // Split the string by commas and then map each element
-  // to trim whitespace from the start and end of the string.
-  return str.split(",").map((word) => word.trim());
-}
+module.exports = { getCanvas };
