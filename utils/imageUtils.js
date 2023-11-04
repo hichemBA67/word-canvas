@@ -1,7 +1,7 @@
 const fs = require("fs");
 const crypto = require("crypto");
 const path = require("path");
-const CanvasModel = require("../models/Canvas");
+const Canvas = require("../models/Canvas");
 const { OUTPUT_PATH } = require("../constants");
 
 const saveImage = async (canvas, userWords) => {

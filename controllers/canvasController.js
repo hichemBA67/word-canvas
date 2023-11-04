@@ -1,5 +1,7 @@
 const { createCanvas } = require("canvas");
 const { saveImage } = require("../utils/imageUtils");
+const path = require("path");
+const fs = require("fs");
 
 // UTILS
 const {
@@ -16,9 +18,13 @@ const {
   MIN_FONTSIZE,
   BASE_FONTFAMILY,
   SUB_FONTS,
+  OUTPUT_PATH,
 } = require("../constants/index");
 
-const getCanvas = async (req, res) => {
+// MODELS
+const Canvas = require("../models/Canvas");
+
+const generateCanvas = async (req, res) => {
   const input = req.body;
 
   try {
@@ -302,4 +308,29 @@ const getCanvas = async (req, res) => {
   }
 };
 
-module.exports = { getCanvas };
+const getCanvas = async (req, res) => {
+  try {
+    const canvas = await Canvas.findOne({ filename: req.params.canvasId });
+
+    if (canvas.length === 0) {
+      return res.status(404).send("Canvas not found");
+    }
+
+    const IMAGES_PATH = path.join(OUTPUT_PATH, `${canvas.filename}.png`);
+
+    // Set the correct content type
+    res.setHeader("Content-Type", "image/png");
+
+    // Create a read stream and pipe it to the response
+    const readStream = fs.createReadStream(IMAGES_PATH);
+    readStream.pipe(res);
+  } catch (error) {
+    // If there's an error, return a 500 server error
+    console.error(error);
+    return res
+      .status(500)
+      .send("An error occurred while fetching the canvas image");
+  }
+};
+
+module.exports = { generateCanvas, getCanvas };
