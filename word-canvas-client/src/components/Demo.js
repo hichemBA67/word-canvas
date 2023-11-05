@@ -10,6 +10,7 @@ const Demo = () => {
   const [canvasId, setCanvasId] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [backgroundUrl, setBackgroundUrl] = useState(null);
+  const [responeText, setResponseText] = useState(null);
 
   const handleInputChange = (e) => {
     setInputText(e.target.value);
@@ -43,28 +44,68 @@ const Demo = () => {
     }
   };
 
+  const acceptCanvas = async () => {
+    try {
+      // Assuming the POST request returns a canvas ID in the response
+      const response = await axios.put(`${API_URL}/canvas/accept/${canvasId}`);
+      setResponseText(response.data);
+    } catch (error) {
+      console.error("Error fetching image", error);
+    }
+  };
+
   return (
-    <div className="center-container">
-      <div className="card">
-        <h1>Demo</h1>
-        <div className="inputFields">
-          <input
-            type="text"
-            value={inputText}
-            onChange={handleInputChange}
-            className="input-text"
-            placeholder="Enter you words, separated by a comma"
-          />
-          <Button onClick={generateCanvas} variant="outlined" color="primary">
-            Generate Canvas
-          </Button>
+    <div>
+      <div className="center-container">
+        <div className="card">
+          <h1>Demo</h1>
+          <div className="inputFields">
+            <input
+              type="text"
+              value={inputText}
+              onChange={handleInputChange}
+              className="input-text"
+              placeholder="Enter you words, separated by a comma"
+            />
+            <Button
+              onClick={generateCanvas}
+              variant="outlined"
+              color="primary"
+              style={{ marginRight: "10px" }}
+            >
+              Generate Canvas
+            </Button>
+            {imageUrl && (
+              <Button onClick={acceptCanvas} variant="outlined" color="success">
+                Accept Canvas
+              </Button>
+            )}
+          </div>
+          <div>
+            {canvasId && (
+              <div>
+                <h5>Canvas ID: </h5>
+                <small>
+                  <i>{canvasId}</i>
+                </small>
+              </div>
+            )}
+            {responeText && <h4 style={{ color: "green" }}>{responeText}</h4>}
+          </div>
         </div>
-        {imageUrl && (
-          <img src={imageUrl} alt="Canvas" className="canvas-image" />
-        )}
-        {imageUrl && (
-          <img src={backgroundUrl} alt="Canvas" className="canvas-image" />
-        )}
+      </div>
+      <div className="center-container">
+        <div className="card">
+          {imageUrl && (
+            <img src={imageUrl} alt="Canvas" className="canvas-image" />
+          )}
+        </div>
+
+        <div className="card">
+          {imageUrl && (
+            <img src={backgroundUrl} alt="Canvas" className="canvas-image" />
+          )}
+        </div>
       </div>
     </div>
   );
