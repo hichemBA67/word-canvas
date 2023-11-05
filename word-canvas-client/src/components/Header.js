@@ -32,7 +32,7 @@ const Header = () => {
           </li> */}
           <li className="navItem">
             <a
-              href={`${API_URL}/api-docs`}
+              href={`${API_URL}/docs`}
               target="_blank"
               rel="noopener noreferrer"
             >
