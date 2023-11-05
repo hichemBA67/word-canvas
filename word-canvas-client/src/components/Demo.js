@@ -94,19 +94,21 @@ const Demo = () => {
           </div>
         </div>
       </div>
-      <div className="center-container">
-        <div className="card">
-          {imageUrl && (
-            <img src={imageUrl} alt="Canvas" className="canvas-image" />
-          )}
-        </div>
+      {canvasId && (
+        <div className="center-container">
+          <div className="card">
+            {imageUrl && (
+              <img src={imageUrl} alt="Canvas" className="canvas-image" />
+            )}
+          </div>
 
-        <div className="card">
-          {imageUrl && (
-            <img src={backgroundUrl} alt="Canvas" className="canvas-image" />
-          )}
+          <div className="card">
+            {imageUrl && (
+              <img src={backgroundUrl} alt="Canvas" className="canvas-image" />
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
