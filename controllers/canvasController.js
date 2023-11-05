@@ -42,8 +42,12 @@ const generateCanvas = async (req, res) => {
     if (input.words) {
       userWords = splitAndTrim(input.words);
     } else {
-      res.type("image/png");
-      return canvas.createPNGStream().pipe(res);
+      // Set the content type to image/png and send the response
+      const imageAsBase64 = canvas.createPNGStream();
+      return res.json({
+        canvasId: "",
+        image: `data:image/png;base64,${imageAsBase64}`,
+      });
     }
 
     // // Stored Words
@@ -295,13 +299,11 @@ const generateCanvas = async (req, res) => {
       }
     }
 
-    if (true) {
-      await saveImage(canvas, input.words);
-    }
+    canvasId = await saveImage(canvas, input.words);
 
-    // Set the content type to image/png and send the response
-    res.type("image/png");
-    return canvas.createPNGStream().pipe(res);
+    return res.json({
+      canvasId: canvasId,
+    });
   } catch (error) {
     console.error(error.message);
     return res.status(500).send("Server error");

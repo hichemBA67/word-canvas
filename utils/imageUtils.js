@@ -6,11 +6,11 @@ const { OUTPUT_PATH } = require("../constants");
 
 const saveImage = async (canvas, userWords) => {
   const stream = canvas.createPNGStream();
-  const steamHash = crypto
+  const streamHash = crypto
     .createHash("sha256")
     .update(userWords + Date.now())
     .digest("hex");
-  const outputPath = `${OUTPUT_PATH}/${steamHash}.png`;
+  const outputPath = `${OUTPUT_PATH}/${streamHash}.png`;
 
   // Get directory without the filename
   const dirPath = path.dirname(outputPath);
@@ -27,11 +27,13 @@ const saveImage = async (canvas, userWords) => {
   });
 
   let newCanvas = new Canvas({
-    filename: steamHash,
+    filename: streamHash,
     userInput: userWords,
   });
 
   await newCanvas.save();
+
+  return streamHash;
 };
 
 module.exports = {
