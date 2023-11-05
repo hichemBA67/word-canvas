@@ -77,7 +77,7 @@ router.get("/:canvasId", canvasController.getCanvas);
  *           type: string
  *     responses:
  *       '200':
- *         description: Creates Canvas (res.type("image/png"))
+ *         description: Canvases deleted successfully
  *       '400':
  *         description: Canvas not found or Canvas cannot be deleted. Canvas is either accepted and not completed.
  *       '404':
@@ -92,17 +92,53 @@ router.delete("/:canvasId", canvasController.deleteCanvas);
  * /api/canvas:
  *   delete:
  *     summary: Clear canvases
- *     description: Delete canvas all unused canvases
+ *     description: Clears all canvases
  *     tags:
  *       - Canvas
  *     responses:
  *       '200':
- *         description: Creates Canvas (res.type("image/png"))
+ *         description: Unused canvases deleted successfully
+ *       '500':
+ *         description: Server error
+ */
+router.delete("/", canvasController.clearCanvases);
+
+/**
+ * @swagger
+ * /api/canvas/accept:
+ *   put:
+ *     summary: Accept canvases
+ *     description: Mark the canvas as accepted. This should be done when customer orders the canvas.
+ *     tags:
+ *       - Canvas
+ *     responses:
+ *       '200':
+ *         description: Canvas successfully accepted
  *       '404':
  *         description: Canvas not found
  *       '500':
  *         description: Server error
  */
-router.delete("/", canvasController.clearCanvases);
+router.put("/accept/:canvasId", canvasController.acceptCanvas);
+
+/**
+ * @swagger
+ * /api/canvas/complete:
+ *   put:
+ *     summary: Mark canvas as complete
+ *     description: Marks canvas as completed
+ *     tags:
+ *       - Canvas
+ *     responses:
+ *       '200':
+ *         description: Canvas successfully marked as completed
+ *       '400':
+ *         description: Canvas was not previously accepted
+ *       '404':
+ *         description: Canvas not found
+ *       '500':
+ *         description: Server error
+ */
+router.put("/complete/:canvasId", canvasController.completeCanvas);
 
 module.exports = router;

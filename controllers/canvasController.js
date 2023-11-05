@@ -406,4 +406,73 @@ const clearCanvases = async (req, res) => {
   }
 };
 
-module.exports = { generateCanvas, getCanvas, deleteCanvas, clearCanvases };
+const acceptCanvas = async (req, res) => {
+  try {
+    const canvasId = req.params.canvasId;
+    let canvas = await Canvas.findOne({ filename: canvasId });
+
+    if (!canvas) {
+      return res.status(404).send("Canvas not found");
+    }
+
+    canvas = await Canvas.findOneAndUpdate(
+      { filename: canvasId },
+      {
+        $set: { accepted: true },
+      },
+      { new: true }
+    );
+
+    await canvas.save();
+
+    return res.status(200).send("Canvas successfully accepted.");
+  } catch (error) {
+    // If there's an error while fetching the canvases, return a 500 server error
+    console.error(error);
+    return res
+      .status(500)
+      .send("An error occurred while accepting the canvases.");
+  }
+};
+
+const completeCanvas = async (req, res) => {
+  try {
+    const canvasId = req.params.canvasId;
+    let canvas = await Canvas.findOne({ filename: canvasId });
+
+    if (!canvas) {
+      return res.status(404).send("Canvas not found");
+    }
+
+    if (!canvas.accepted) {
+      return res.status(400).send("Canvas was not previously accepted.");
+    }
+
+    canvas = await Canvas.findOneAndUpdate(
+      { filename: canvasId },
+      {
+        $set: { completed: true },
+      },
+      { new: true }
+    );
+
+    await canvas.save();
+
+    return res.status(200).send("Canvas successfully marked as completed.");
+  } catch (error) {
+    // If there's an error while fetching the canvases, return a 500 server error
+    console.error(error);
+    return res
+      .status(500)
+      .send("An error occurred while marking the canvas as completed.");
+  }
+};
+
+module.exports = {
+  generateCanvas,
+  getCanvas,
+  deleteCanvas,
+  clearCanvases,
+  acceptCanvas,
+  completeCanvas,
+};
