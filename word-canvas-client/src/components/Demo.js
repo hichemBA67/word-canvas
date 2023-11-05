@@ -46,6 +46,7 @@ const Demo = () => {
   return (
     <div className="center-container">
       <div className="card">
+        <h1>Demo</h1>
         <div className="inputFields">
           <input
             type="text"

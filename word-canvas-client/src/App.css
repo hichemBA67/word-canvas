@@ -29,3 +29,23 @@ table {
 .delete-button:hover {
   background-color: #b30000;
 }
+
+.center-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  min-height: 100%; /* You can change this to your preferred background */
+}
+
+/* Style for the card itself */
+.card {
+  width: 30rem;
+  max-width: 50rem;
+  text-align: center;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); /* This adds a shadow effect */
+  background-color: #ffffff; /* Card background color */
+  padding: 20px; /* Space inside the card */
+  margin: 0 auto; /* Center the card */
+  border-radius: 8px; /* Optional: if you want rounded corners */
+}

@@ -144,6 +144,12 @@ router.delete("/", canvasController.clearCanvases);
  *     description: Mark the canvas as accepted. This should be done when customer orders the canvas.
  *     tags:
  *       - Canvas
+ *     parameters:
+ *       - in: query
+ *         name: canvasId
+ *         description: Internal Canvas ID (SHA256 of user input & date of generation)
+ *         schema:
+ *           type: string
  *     responses:
  *       '200':
  *         description: Canvas successfully accepted
@@ -159,9 +165,15 @@ router.put("/accept/:canvasId", canvasController.acceptCanvas);
  * /api/canvas/complete:
  *   put:
  *     summary: Mark canvas as complete
- *     description: Marks canvas as completed
+ *     description: Marks canvas as completed. This should be done when order is completed. After canvas is marked as completed, the canvas is subject to deletion.
  *     tags:
  *       - Canvas
+ *     parameters:
+ *       - in: query
+ *         name: canvasId
+ *         description: Internal Canvas ID (SHA256 of user input & date of generation)
+ *         schema:
+ *           type: string
  *     responses:
  *       '200':
  *         description: Canvas successfully marked as completed

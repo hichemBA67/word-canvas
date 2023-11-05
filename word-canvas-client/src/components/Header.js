@@ -15,11 +15,11 @@ const Header = () => {
       </div>
       <nav>
         <ul className="navList">
-          <li className="navItem">
+          {/* <li className="navItem">
             <Link to="/">Home</Link>
-          </li>
+          </li> */}
           <li className="navItem">
-            <Link to="/demo">Demo</Link>
+            <Link to="/">Demo</Link>
           </li>
           <li className="navItem">
             <Link to="/settings">Settings</Link>
