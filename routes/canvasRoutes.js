@@ -30,7 +30,16 @@ const canvasController = require("../controllers/canvasController");
  *                 example: "Overcome, Progress, Achieve, Conquer"
  *     responses:
  *       '200':
- *         description: Creates Canvas (res.type("image/png"))
+ *         description: Canvas created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 canvasId:
+ *                   type: string
+ *                   description: The unique identifier for the created canvas
+ *                   example: "58f77c6bd9283d1a7593c67e11b944afaede4741d011f9380bc5f86e2478d993"
  *       '500':
  *         description: Server error
  */
@@ -53,13 +62,37 @@ router.post("/", canvasController.generateCanvas);
  *           type: string
  *     responses:
  *       '200':
- *         description: Creates Canvas (res.type("image/png"))
+ *         description: Returns Canvas (res.type("image/png"))
  *       '404':
  *         description: Canvas not found
  *       '500':
  *         description: Server error
  */
 router.get("/:canvasId", canvasController.getCanvas);
+
+/**
+ * @swagger
+ * /api/canvas/background:
+ *   get:
+ *     summary: Get canvas with background
+ *     description: Get canvas with backgroundwith canvas ID
+ *     tags:
+ *       - Canvas
+ *     parameters:
+ *       - in: query
+ *         name: canvasId
+ *         description: Internal Canvas ID (SHA256 of user input & date of generation)
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: res.type("image/png")
+ *       '404':
+ *         description: Canvas not found
+ *       '500':
+ *         description: Server error
+ */
+router.get("/background/:canvasId", canvasController.getBackgroundCanvas);
 
 /**
  * @swagger

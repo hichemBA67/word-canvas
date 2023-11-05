@@ -1,7 +1,7 @@
 module.exports = {
   OUTPUT_PATH: "./assets/images",
-  MIN_FONTSIZE: 24,
-  MAX_FONTSIZE: 38,
+  MIN_FONTSIZE: 72,
+  MAX_FONTSIZE: 114,
   BASE_FONTFAMILY: "RobotoSlab",
   SUB_FONTS: [
     "Regular",
@@ -12,7 +12,7 @@ module.exports = {
     "Light",
     "Medium",
   ],
-  CANVAS_HEIGHT: 14043,
-  CANVAS_WIDTH: 9933,
-  PADDING: 30,
+  CANVAS_HEIGHT: 2430,
+  CANVAS_WIDTH: 1770,
+  PADDING: 120,
 };

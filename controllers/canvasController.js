@@ -2,6 +2,7 @@ const { createCanvas } = require("canvas");
 const { saveImage } = require("../utils/imageUtils");
 const path = require("path");
 const fs = require("fs");
+const sharp = require("sharp");
 
 // UTILS
 const {
@@ -85,12 +86,12 @@ const generateCanvas = async (req, res) => {
     // Set Data Structures
     const endpoint = {};
     endpoint.x = width - padding;
-    endpoint.y = height - padding;
+    endpoint.y = height - padding - MIN_FONTSIZE;
 
     let cursor = {};
-    cursor.x = 30;
-    cursor.y = 50;
-    let lineSpaceRest = width - padding;
+    cursor.x = padding;
+    cursor.y = padding + MIN_FONTSIZE;
+    let lineSpaceRest = cursor.x - padding;
     let emptySlots = [];
 
     console.log(
@@ -321,13 +322,13 @@ const getCanvas = async (req, res) => {
       return res.status(404).send("Canvas not found");
     }
 
-    const IMAGES_PATH = path.join(OUTPUT_PATH, `${canvas.filename}.png`);
+    const imagePath = path.join(OUTPUT_PATH, `${canvas.filename}.png`);
 
     // Set the correct content type
     res.setHeader("Content-Type", "image/png");
 
     // Create a read stream and pipe it to the response
-    const readStream = fs.createReadStream(IMAGES_PATH);
+    const readStream = fs.createReadStream(imagePath);
     readStream.pipe(res);
   } catch (error) {
     // If there's an error, return a 500 server error
@@ -335,6 +336,69 @@ const getCanvas = async (req, res) => {
     return res
       .status(500)
       .send("An error occurred while fetching the canvas image");
+  }
+};
+
+const getBackgroundCanvas = async (req, res) => {
+  try {
+    const canvas = await Canvas.findOne({ filename: req.params.canvasId });
+
+    if (!canvas) {
+      return res.status(404).send("Canvas not found");
+    }
+
+    const foregroundImagePath = path.join(
+      OUTPUT_PATH,
+      `${canvas.filename}.png`
+    );
+    const backgroundImagePath = path.join(
+      "./assets/background",
+      "background.png"
+    );
+
+    const foregroundSize = {
+      width: 590, // Desired width for the foreground image
+      height: 810, // Desired height for the foreground image
+    };
+
+    // Ensure both images exist
+    if (
+      !fs.existsSync(foregroundImagePath) ||
+      !fs.existsSync(backgroundImagePath)
+    ) {
+      return res.status(404).send("One or both images not found");
+    }
+
+    // Use sharp to resize the foreground image if necessary and composite it over the background
+    res.type("image/png");
+
+    sharp(foregroundImagePath)
+      .resize(foregroundSize.width, foregroundSize.height) // Set the desired size
+      .toBuffer()
+      .then((resizedForegroundBuffer) => {
+        sharp(backgroundImagePath)
+          .composite([
+            {
+              input: resizedForegroundBuffer,
+              left: 1320, // Position on the background image
+              top: 450, // Position on the background image
+              blend: "over",
+            },
+          ])
+          .png()
+          .pipe(res)
+          .on("error", (err) => {
+            console.error("An error occurred during image compositing:", err);
+            res.status(500).send("An error occurred during image compositing");
+          });
+      })
+      .catch((err) => {
+        console.error("An error occurred during image resizing:", err);
+        res.status(500).send("An error occurred during image resizing");
+      });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while processing the canvas");
   }
 };
 
@@ -355,11 +419,11 @@ const deleteCanvas = async (req, res) => {
       return res.status(400).send(`Canvas is not older than one day`);
     }
 
-    const IMAGES_PATH = path.join(OUTPUT_PATH, `${canvas.filename}.png`);
+    const imagePath = path.join(OUTPUT_PATH, `${canvas.filename}.png`);
 
     // Check if the file exists before attempting to delete
-    if (fs.existsSync(IMAGES_PATH)) {
-      fs.unlinkSync(IMAGES_PATH); // Delete the image file
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath); // Delete the image file
       await Canvas.deleteOne({ filename: req.params.canvasId }); // Delete the canvas record from database, if required
 
       return res.send("Canvas deleted successfully");
@@ -384,11 +448,11 @@ const clearCanvases = async (req, res) => {
     for (const canvas of canvases) {
       if (canvas.createdAt > oneDayAgo) {
         try {
-          const IMAGES_PATH = path.join(OUTPUT_PATH, `${canvas.filename}.png`);
+          const imagePath = path.join(OUTPUT_PATH, `${canvas.filename}.png`);
 
           // Check if the file exists before attempting to delete
-          if (fs.existsSync(IMAGES_PATH)) {
-            fs.unlinkSync(IMAGES_PATH); // Delete the image file
+          if (fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath); // Delete the image file
 
             // Assuming you want to delete by canvas._id instead of req.params.canvasId since you are iterating through multiple canvases
             await Canvas.findOneAndRemove({ _id: canvas._id });
@@ -480,4 +544,5 @@ module.exports = {
   clearCanvases,
   acceptCanvas,
   completeCanvas,
+  getBackgroundCanvas,
 };
