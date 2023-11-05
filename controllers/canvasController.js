@@ -23,6 +23,8 @@ const {
   CANVAS_HEIGHT,
   CANVAS_WIDTH,
   PADDING,
+  LINESPACE,
+  WORDSPACE,
 } = require("../constants/index");
 
 // MODELS
@@ -79,14 +81,14 @@ const generateCanvas = async (req, res) => {
     // });
 
     // Set options
-    const lineSpace = (MAX_FONTSIZE - MIN_FONTSIZE) / 2;
-    const wordSpace = 5;
+    const lineSpace = LINESPACE;
+    const wordSpace = WORDSPACE;
     let fontFamily;
 
     // Set Data Structures
     const endpoint = {};
     endpoint.x = width - padding;
-    endpoint.y = height - padding - MIN_FONTSIZE;
+    endpoint.y = height;
 
     let cursor = {};
     cursor.x = padding;
@@ -127,6 +129,7 @@ const generateCanvas = async (req, res) => {
 
         // Iterate through words of phrase
         separatedWords.forEach((word) => {
+          if (!continueLoop) return;
           // Copy font size for line height
           const defaultFontSize = fontSize;
 
@@ -192,6 +195,7 @@ const generateCanvas = async (req, res) => {
                 console.log(`to: ${cursor.x}`);
 
                 if (cursor.y >= endpoint.y) {
+                  console.log("Exits loop at 0");
                   continueLoop = false; // Set the flag to false to indicate the loop should exit
                   return; // This will exit the forEach callback, not the do...while loop
                 }
@@ -222,8 +226,11 @@ const generateCanvas = async (req, res) => {
               // LOG CURSOR
               console.log(`-- Cursor y updated from: ${cursor.y}`);
               cursor.y += defaultFontSize + lineSpace;
+
               if (cursor.y >= endpoint.y) {
-                // End while loop here
+                console.log("Exits loop at 0.2");
+                continueLoop = false; // Set the flag to false to indicate the loop should exit
+                return; // This will exit the forEach callback, not the do...while loop
               }
               console.log(`to: ${cursor.y}`);
               console.log(`-- Cursor x updated from: ${cursor.x}`);
@@ -254,6 +261,7 @@ const generateCanvas = async (req, res) => {
         });
       });
       if (!continueLoop) {
+        console.log("Exits loop at 1");
         break; // Exit the loop if the flag is set to false
       }
     } while (continueLoop && cursor.y <= endpoint.y);
