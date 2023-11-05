@@ -1,0 +1,26 @@
+/* Style for the container that centers everything */
+body {
+  background-color: #f0f0f0;
+}
+
+h1 {
+  color: #272727;
+}
+
+/* Style for the input text field */
+.input-text {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+/* Style for the image */
+.canvas-image {
+  max-width: 100%;
+  height: auto;
+  display: block; /* Ensures it takes up the whole line */
+  margin: 0 auto; /* Center the image inside the card */
+}
+
+.inputFields {
+  margin-bottom: 2rem;
+}
