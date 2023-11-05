@@ -12,7 +12,7 @@ module.exports = {
     "Light",
     "Medium",
   ],
-  CANVAS_HEIGHT: 800,
-  CANVAS_WIDTH: 540,
+  CANVAS_HEIGHT: 14043,
+  CANVAS_WIDTH: 9933,
   PADDING: 30,
 };
