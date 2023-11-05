@@ -19,6 +19,9 @@ const {
   BASE_FONTFAMILY,
   SUB_FONTS,
   OUTPUT_PATH,
+  CANVAS_HEIGHT,
+  CANVAS_WIDTH,
+  PADDING,
 } = require("../constants/index");
 
 // MODELS
@@ -29,9 +32,9 @@ const generateCanvas = async (req, res) => {
 
   try {
     // Create a canvas
-    const width = 540;
-    height = 800;
-    const padding = 30;
+    const width = CANVAS_WIDTH;
+    height = CANVAS_HEIGHT;
+    const padding = PADDING;
     const canvas = createCanvas(width, height);
     const ctx = canvas.getContext("2d");
     ctx.fillStyle = "white";
