@@ -20,14 +20,14 @@ app.use(cors());
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
 // Serve Swagger UI
-app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
+app.use("/api/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
 app.get("/", (req, res) => {
   res.json("Welcome to the Word-Canvas Backend");
 });
 
 app.use("/api/words", require("./routes/words"));
-app.use("/api/canvas", require("./routes/canvas"));
+app.use("/api/canvas", require("./routes/canvasRoutes"));
 app.use("/api/filler", require("./routes/filler"));
 
 app.listen(PORT, () => {

@@ -27,7 +27,7 @@ const { check, validationResult } = require("express-validator");
 router.get("/", async (req, res) => {
   const words = await Words.find();
 
-  if (Words.length === 0) {
+  if (words.length === 0) {
     res.json("No Words found!");
   }
 

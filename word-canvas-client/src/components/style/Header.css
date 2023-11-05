@@ -1,0 +1,47 @@
+/* Header.css */
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #232323;
+}
+
+.logo {
+  width: 50px;
+  height: 50px;
+}
+
+.navList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 1.2rem;
+}
+
+.navItem a {
+  text-decoration: none;
+  color: white; /* Making links white */
+}
+
+.navItem a:hover {
+  opacity: 0.7; /* Adding a hover effect */
+  color: #8dc640;
+}
+
+.logo {
+  width: 8rem; /* Adjust as needed */
+  height: auto; /* This maintains the aspect ratio */
+}
+
+.slidemotifLogo {
+  margin-top: 2rem;
+  width: 4rem; /* Adjust as needed */
+  height: auto; /* This maintains the aspect ratio */
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+}

@@ -1,6 +1,6 @@
 const swaggerOptions = {
   swaggerDefinition: require("./swaggerDef"),
-  apis: ["./routes/*.js"], // Specify the path to your route files
+  apis: ["./routes/canvasRoutes.js"], // Specify the path to your route files
 };
 
 module.exports = swaggerOptions;
