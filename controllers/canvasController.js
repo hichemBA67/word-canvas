@@ -32,6 +32,7 @@ const Canvas = require("../models/Canvas");
 
 const generateCanvas = async (req, res) => {
   const input = req.body;
+  console.log(input);
 
   try {
     // Create a canvas
@@ -48,11 +49,8 @@ const generateCanvas = async (req, res) => {
     if (input.words) {
       userWords = splitAndTrim(input.words);
     } else {
-      // Set the content type to image/png and send the response
-      const imageAsBase64 = canvas.createPNGStream();
       return res.json({
         canvasId: "",
-        image: `data:image/png;base64,${imageAsBase64}`,
       });
     }
 

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import "./style/Words.css";
 
 import Button from "@mui/material/Button";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
