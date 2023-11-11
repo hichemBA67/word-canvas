@@ -314,8 +314,8 @@ const getBackgroundCanvas = async (req, res) => {
     );
 
     const foregroundSize = {
-      width: canvas.settings.canvasWidth || 590, // Desired settings.canvasWidth for the foreground image
-      height: canvas.settings.canvasWidth || 810, // Desired settings.canvasHeight for the foreground image
+      width: 590, // Desired settings.canvasWidth for the foreground image
+      height: 810, // Desired settings.canvasHeight for the foreground image
     };
 
     // Ensure both images exist
@@ -330,10 +330,7 @@ const getBackgroundCanvas = async (req, res) => {
     res.type("image/png");
 
     sharp(foregroundImagePath)
-      .resize(
-        foregroundSize.settings.canvasWidth,
-        foregroundSize.settings.canvasHeight
-      ) // Set the desired size
+      .resize(foregroundSize.width, foregroundSize.height) // Set the desired size
       .toBuffer()
       .then((resizedForegroundBuffer) => {
         sharp(backgroundImagePath)
