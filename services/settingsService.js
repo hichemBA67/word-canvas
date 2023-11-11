@@ -28,6 +28,7 @@ async function getSettings(settingsId) {
   settingsField.linespace = settings.lineSpace || LINESPACE;
   settingsField.wordSpace = settings.wordSpace || WORDSPACE;
   settingsField.padding = settings.padding || PADDING;
+  settingsField.id = settings._id || null;
 
   return settings;
 }
