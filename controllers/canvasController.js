@@ -258,7 +258,7 @@ const generateCanvas = async (req, res) => {
       }
     }
 
-    canvasId = await saveImage(canvas, input.words);
+    canvasId = await saveImage(canvas, input.words, settings.id);
 
     return res.json({
       canvasId: canvasId,
@@ -413,7 +413,6 @@ const clearCanvases = async (req, res) => {
 
             // Assuming you want to delete by canvas._id instead of req.params.canvasId since you are iterating through multiple canvases
             await Canvas.findOneAndRemove({ _id: canvas._id });
-            console.log(`Deleted canvas with ID: ${canvas._id}`);
           }
         } catch (error) {
           // If there's an error, console log it but don't send a response yet
