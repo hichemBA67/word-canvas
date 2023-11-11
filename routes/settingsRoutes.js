@@ -139,9 +139,33 @@ router.put("/:settingsId", settingsController.updateSettings);
  *     responses:
  *       '200':
  *         description: Settings successfully set as default
+ *       '404':
+ *         description: Settings not found
  *       '500':
  *         description: Server error
  */
 router.put("/set-default/:settingsId", settingsController.setDefault);
+
+/**
+ * @swagger
+ * /api/settings/:
+ *   delete:
+ *     summary: Delete settings
+ *     description: Delete settings with id
+ *     tags:
+ *       - Settings
+ *     parameters:
+ *       - in: query
+ *         name: settingsId
+ *         description: Internal settings id
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Settings deleted successfully
+ *       '500':
+ *         description: Server error
+ */
+router.delete("/:settingsId", settingsController.deleteSettings);
 
 module.exports = router;

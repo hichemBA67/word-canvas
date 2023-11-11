@@ -88,11 +88,24 @@ const setDefault = async (req, res) => {
 
     await newDefaultSettings.save();
 
-    res
+    return res
       .status(200)
       .json(
         `Settings (_id: ${req.params.settingsId}) successfully set to default.`
       );
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server error");
+  }
+};
+
+const deleteSettings = async (req, res) => {
+  try {
+    await Settings.deleteOne({ _id: req.params.settingsId });
+
+    return res
+      .status(200)
+      .json(`Settings (_id: ${req.params.settingsId}) deleted successfully.`);
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server error");
@@ -104,4 +117,5 @@ module.exports = {
   createSettings,
   updateSettings,
   setDefault,
+  deleteSettings,
 };
