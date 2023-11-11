@@ -14,17 +14,11 @@ const {
 } = require("../utils/canvasUtils");
 
 // CONSTANTS
+const settingsService = require("../services/settingsService");
 const {
-  MAX_FONTSIZE,
-  MIN_FONTSIZE,
   BASE_FONTFAMILY,
   SUB_FONTS,
   OUTPUT_PATH,
-  CANVAS_HEIGHT,
-  CANVAS_WIDTH,
-  PADDING,
-  LINESPACE,
-  WORDSPACE,
 } = require("../constants/index");
 
 // MODELS
@@ -32,17 +26,17 @@ const Canvas = require("../models/Canvas");
 
 const generateCanvas = async (req, res) => {
   const input = req.body;
-  console.log(input);
 
   try {
+    // Get settings
+    const settings = await settingsService.getSettings(req.params.settingsId);
+
     // Create a canvas
-    const width = CANVAS_WIDTH;
-    height = CANVAS_HEIGHT;
-    const padding = PADDING;
-    const canvas = createCanvas(width, height);
+
+    const canvas = createCanvas(settings.canvasWidth, settings.canvasHeight);
     const ctx = canvas.getContext("2d");
     ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, width, height);
+    ctx.fillRect(0, 0, settings.canvasWidth, settings.canvasHeight);
 
     // Prepare UserWords
     let userWords;
@@ -79,24 +73,18 @@ const generateCanvas = async (req, res) => {
     // });
 
     // Set options
-    const lineSpace = LINESPACE;
-    const wordSpace = WORDSPACE;
     let fontFamily;
 
     // Set Data Structures
     const endpoint = {};
-    endpoint.x = width - padding;
-    endpoint.y = height;
+    endpoint.x = settings.canvasWidth - settings.padding;
+    endpoint.y = settings.canvasHeight;
 
     let cursor = {};
-    cursor.x = padding;
-    cursor.y = padding + MIN_FONTSIZE;
-    let lineSpaceRest = cursor.x - padding;
+    cursor.x = settings.padding;
+    cursor.y = settings.padding + settings.minFontSize;
+    let lineSpaceRest = cursor.x - settings.padding;
     let emptySlots = [];
-
-    console.log(
-      "==================================================================================================="
-    );
 
     let shuffledPhrases;
     let shuffledFillers = fillers.sort(() => 0.5 - Math.random());
@@ -108,15 +96,15 @@ const generateCanvas = async (req, res) => {
       shuffledPhrases = allPhrases.sort(() => 0.5 - Math.random());
 
       shuffledPhrases.forEach(({ text, type }) => {
-        console.log(
-          `==============================================NEW PHRASE ${text}=============================`
-        );
-
         let i = 0;
         // Generate a random index within the array length
         const randomIndex = Math.floor(Math.random() * SUB_FONTS.length);
 
-        let fontSize = getFontSize(type);
+        let fontSize = getFontSize(
+          type,
+          settings.maxFontSize,
+          settings.minFontSize
+        );
         fontFamily = BASE_FONTFAMILY + " " + SUB_FONTS[randomIndex];
         ctx.font = `${fontSize}px ${fontFamily}`;
 
@@ -128,21 +116,14 @@ const generateCanvas = async (req, res) => {
         // Iterate through words of phrase
         separatedWords.forEach((word) => {
           if (!continueLoop) return;
-          // Copy font size for line height
+          // Copy font size for line settings.canvasHeight
           const defaultFontSize = fontSize;
 
-          lineSpaceRest = width - padding - cursor.x;
-          console.log("\nNext word: " + word);
-          console.log(`Word in phrase count: ${i}`);
+          lineSpaceRest = settings.canvasWidth - settings.padding - cursor.x;
 
           const textWidth = ctx.measureText(word).width;
-          console.log("Word width: " + textWidth);
 
-          console.log("Current cursor position x: " + cursor.x);
-          console.log("Current cursor position y: " + cursor.y);
-          console.log("Rest space would be: " + lineSpaceRest);
-
-          if (cursor.x + textWidth + padding > width) {
+          if (cursor.x + textWidth + settings.padding > textWidth) {
             // IF WORD IS OUT OF BOUNDS
             if (i === 0) {
               let fontSizeFit = getFontSizeForWidth(
@@ -152,11 +133,8 @@ const generateCanvas = async (req, res) => {
                 fontSize,
                 fontFamily
               );
-              console.log("++ new potential font size: " + fontSizeFit);
 
               if (fontSizeFit > 18) {
-                console.log("++ new font size accepted");
-
                 // Overwrite fontsize
                 fontSize = fontSizeFit;
 
@@ -169,12 +147,9 @@ const generateCanvas = async (req, res) => {
                 logWriting(word, cursor, fontSize);
 
                 // LOG CURSOR
-                console.log(`-- Cursor x updated from: ${cursor.x}`);
-                cursor.x += ctx.measureText(word).width + wordSpace;
-                console.log(`to: ${cursor.x}`);
-              } else {
-                console.log("++ new font size declined");
 
+                cursor.x += ctx.measureText(word).width + settings.wordSpace;
+              } else {
                 if (lineSpaceRest > 0) {
                   // Add Empty slot
                   emptySlots.push({
@@ -185,15 +160,11 @@ const generateCanvas = async (req, res) => {
                 }
 
                 // LOG CURSOR
-                console.log(`-- Cursor y updated from: ${cursor.y}`);
-                cursor.y += defaultFontSize + lineSpace;
-                console.log(`to: ${cursor.y}`);
-                console.log(`-- Cursor x updated from: ${cursor.x}`);
-                cursor.x = padding;
-                console.log(`to: ${cursor.x}`);
+
+                cursor.y += defaultFontSize + settings.lineSpace;
+                cursor.x = settings.padding;
 
                 if (cursor.y >= endpoint.y) {
-                  console.log("Exits loop at 0");
                   continueLoop = false; // Set the flag to false to indicate the loop should exit
                   return; // This will exit the forEach callback, not the do...while loop
                 }
@@ -203,14 +174,9 @@ const generateCanvas = async (req, res) => {
                 ctx.fillText(word, cursor.x, cursor.y);
                 logWriting(word, cursor, fontSize);
 
-                // LOG CURSOR
-                console.log(`-- Cursor x updated from: ${cursor.x}`);
-                cursor.x += ctx.measureText(word).width + wordSpace;
-                console.log(`to: ${cursor.x}`);
+                cursor.x += ctx.measureText(word).width + settings.wordSpace;
               }
             } else {
-              console.log("++ new font size declined");
-
               if (lineSpaceRest > 0) {
                 // Add Empty slot
                 emptySlots.push({
@@ -222,36 +188,28 @@ const generateCanvas = async (req, res) => {
               }
 
               // LOG CURSOR
-              console.log(`-- Cursor y updated from: ${cursor.y}`);
-              cursor.y += defaultFontSize + lineSpace;
+              cursor.y += defaultFontSize + settings.lineSpace;
 
               if (cursor.y >= endpoint.y) {
-                console.log("Exits loop at 0.2");
                 continueLoop = false; // Set the flag to false to indicate the loop should exit
                 return; // This will exit the forEach callback, not the do...while loop
               }
-              console.log(`to: ${cursor.y}`);
-              console.log(`-- Cursor x updated from: ${cursor.x}`);
-              cursor.x = padding;
-              console.log(`to: ${cursor.x}`);
+              cursor.x = settings.padding;
 
               // WRITE WORD
               ctx.font = `${defaultFontSize}px ${fontFamily}`;
               ctx.fillText(word, cursor.x, cursor.y);
               logWriting(word, cursor, fontSize);
 
-              // LOG CURSOR
-              console.log(`-- Cursor x updated from: ${cursor.x}`);
-              cursor.x += ctx.measureText(word).width + wordSpace;
-              console.log(`to: ${cursor.x}`);
+              cursor.x +=
+                ctx.measureText(word).settings.canvasWidth + settings.wordSpace;
             }
           } else {
             ctx.fillText(word, cursor.x, cursor.y);
             logWriting(word, cursor, fontSize);
 
-            console.log(`-- Cursor x updated from: ${cursor.x}`);
-            cursor.x += ctx.measureText(word).width + wordSpace;
-            console.log(`to: ${cursor.x}`);
+            cursor.x +=
+              ctx.measureText(word).settings.canvasWidth + settings.wordSpace;
           }
 
           // INCREASE COUNTER OF WORDS IN PHRASE
@@ -259,7 +217,6 @@ const generateCanvas = async (req, res) => {
         });
       });
       if (!continueLoop) {
-        console.log("Exits loop at 1");
         break; // Exit the loop if the flag is set to false
       }
     } while (continueLoop && cursor.y <= endpoint.y);
@@ -278,21 +235,13 @@ const generateCanvas = async (req, res) => {
           emptySlots[i].fontSize,
           fontFamily
         );
-        console.log(
-          shuffledFillers[j],
-          ctx.measureText(shuffledFillers[j]).width,
-          emptySlots[i].space
-        );
-
-        console.log(
-          ctx.measureText(shuffledFillers[j]).width - emptySlots[i].space
-        );
 
         if (
           fillerFontSize <= emptySlots[i].fontSize &&
-          fillerFontSize >= MIN_FONTSIZE &&
+          fillerFontSize >= settings.minFontSize &&
           Math.abs(
-            ctx.measureText(shuffledFillers[j]).width - emptySlots[i].space
+            ctx.measureText(shuffledFillers[j]).settings.canvasWidth -
+              emptySlots[i].space
           ) <= 20
         ) {
           ctx.font = `${fillerFontSize}px ${fontFamily}`;
@@ -347,7 +296,9 @@ const getCanvas = async (req, res) => {
 
 const getBackgroundCanvas = async (req, res) => {
   try {
-    const canvas = await Canvas.findOne({ filename: req.params.canvasId });
+    const canvas = await Canvas.findOne({
+      filename: req.params.canvasId,
+    }).populate("settings");
 
     if (!canvas) {
       return res.status(404).send("Canvas not found");
@@ -363,8 +314,8 @@ const getBackgroundCanvas = async (req, res) => {
     );
 
     const foregroundSize = {
-      width: 590, // Desired width for the foreground image
-      height: 810, // Desired height for the foreground image
+      width: 590, // Desired settings.canvasWidth for the foreground image
+      height: 810, // Desired settings.canvasHeight for the foreground image
     };
 
     // Ensure both images exist

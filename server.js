@@ -28,6 +28,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/words", require("./routes/words"));
 app.use("/api/canvas", require("./routes/canvasRoutes"));
+app.use("/api/settings", require("./routes/settingsRoutes"));
 app.use("/api/filler", require("./routes/filler"));
 
 app.listen(PORT, () => {

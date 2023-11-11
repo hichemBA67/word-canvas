@@ -1,6 +1,4 @@
-const { MAX_FONTSIZE, MIN_FONTSIZE } = require("../constants/index");
-
-function getFontSize(type) {
+function getFontSize(type, MAX_FONTSIZE, MIN_FONTSIZE) {
   if (type == "stored") {
     return (
       Math.floor(Math.random() * (MAX_FONTSIZE - MIN_FONTSIZE + 1)) +
