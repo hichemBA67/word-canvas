@@ -17,6 +17,10 @@ const CanvasSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  settings: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "settings",
+  },
 });
 
 module.exports = Canvas = mongoose.model("canvas", CanvasSchema);

@@ -122,4 +122,26 @@ router.post(
 
 router.put("/:settingsId", settingsController.updateSettings);
 
+/**
+ * @swagger
+ * /api/settings/set-default:
+ *   put:
+ *     summary: Set settings as default
+ *     description:
+ *     tags:
+ *       - Settings
+ *     parameters:
+ *       - in: query
+ *         name: settingsId
+ *         description: Internal settingsId
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Settings successfully set as default
+ *       '500':
+ *         description: Server error
+ */
+router.put("/set-default/:settingsId", settingsController.setDefault);
+
 module.exports = router;

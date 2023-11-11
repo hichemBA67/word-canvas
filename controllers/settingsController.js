@@ -56,8 +56,52 @@ const createSettings = async (req, res) => {
 
 const updateSettings = async (req, res) => {};
 
+const setDefault = async (req, res) => {
+  try {
+    let newDefaultSettings = await Settings.findById(req.params.settingsId);
+    if (!newDefaultSettings) {
+      return res
+        .status(404)
+        .json(`Settings with id ${req.params.settingsId} not found.`);
+    }
+
+    let oldDefaultSettings = await Settings.findOne({ default: true });
+    if (oldDefaultSettings) {
+      oldDefaultSettings = await Settings.findOneAndUpdate(
+        { default: true },
+        {
+          $set: { default: false },
+        },
+        { new: true }
+      );
+
+      await oldDefaultSettings.save();
+    }
+
+    newDefaultSettings = await Settings.findOneAndUpdate(
+      { _id: req.params.settingsId },
+      {
+        $set: { default: true },
+      },
+      { new: true }
+    );
+
+    await newDefaultSettings.save();
+
+    res
+      .status(200)
+      .json(
+        `Settings (_id: ${req.params.settingsId}) successfully set to default.`
+      );
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server error");
+  }
+};
+
 module.exports = {
   getSettings,
   createSettings,
   updateSettings,
+  setDefault,
 };
