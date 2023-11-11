@@ -44,7 +44,7 @@ const canvasController = require("../controllers/canvasController");
  *         description: Server error
  */
 
-router.post("/", canvasController.generateCanvas);
+router.post("/:settingsId?", canvasController.generateCanvas);
 
 /**
  * @swagger

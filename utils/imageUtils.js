@@ -4,7 +4,7 @@ const path = require("path");
 const Canvas = require("../models/Canvas");
 const { OUTPUT_PATH } = require("../constants");
 
-const saveImage = async (canvas, userWords) => {
+const saveImage = async (canvas, userWords, settingsId) => {
   const stream = canvas.createPNGStream();
   const streamHash = crypto
     .createHash("sha256")
@@ -29,6 +29,7 @@ const saveImage = async (canvas, userWords) => {
   let newCanvas = new Canvas({
     filename: streamHash,
     userInput: userWords,
+    settings: settingsId,
   });
 
   await newCanvas.save();
